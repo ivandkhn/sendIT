@@ -11,7 +11,21 @@ import MultipeerConnectivity
 
 class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControllerDelegate {
 
+    //MARK: constants
     let STRING_ENCODING = String.Encoding.unicode
+    
+    //MARK: outlet variables
+    @IBOutlet weak var messageHistoryView: UITextView!
+    @IBOutlet weak var messageInputField: UITextField!
+    
+    //MARK: outlet functions
+    @IBAction func tapSendButton(_ sender: UIButton) {
+        guard let stringMessage = messageInputField.text else {
+            Log.w("in \(getPeerName()) no text entered in textField, cannot send empty message")
+            return
+        }
+        self.send(stringMessage: stringMessage, encoding: STRING_ENCODING)
+    }
     
     //MARK: variables
     var peerID: MCPeerID!
@@ -78,7 +92,7 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         DispatchQueue.main.async {
             if let receivedMessage = String(data: data, encoding: self.STRING_ENCODING) {
-                // TODO: show massage on screen
+                self.messageHistoryView.text = self.messageHistoryView.text + "\n" + receivedMessage
             } else {
                 Log.w("\(peerID.displayName) is unable to decode received message as string")
             }
