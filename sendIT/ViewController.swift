@@ -27,6 +27,14 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
         self.send(stringMessage: stringMessage, encoding: STRING_ENCODING)
     }
     
+    @IBAction func tapHostSessionButton(_ sender: UIButton) {
+        hostSession()
+    }
+    
+    @IBAction func tapJoinSessionButton(_ sender: UIButton) {
+        joinSession()
+    }
+    
     //MARK: variables
     var peerID: MCPeerID!
     var mcSession: MCSession!
@@ -45,14 +53,14 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
         }
     }
     
-    func hostSession(action: UIAlertAction) {
-        mcAdvertiserAssistant = MCAdvertiserAssistant(serviceType: "ivan-chat", discoveryInfo: nil, session: mcSession)
+    func hostSession() {
+        mcAdvertiserAssistant = MCAdvertiserAssistant(serviceType: "ivanChat", discoveryInfo: nil, session: mcSession)
         mcAdvertiserAssistant.start()
         Log.i("\(getPeerName()) is starting session...")
     }
     
-    func joinSession(action: UIAlertAction) {
-        let mcBrowser = MCBrowserViewController(serviceType: "ivan-chat", session: mcSession)
+    func joinSession() {
+        let mcBrowser = MCBrowserViewController(serviceType: "ivanChat", session: mcSession)
         mcBrowser.delegate = self
         present(mcBrowser, animated: true)
         Log.i("joining session...")
@@ -78,7 +86,9 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     //MARK: UI functions
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        peerID = MCPeerID(displayName: UIDevice.current.name)
+        mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .none)
+        mcSession.delegate = self
     }
     
     /// from MCBrowserViewController
