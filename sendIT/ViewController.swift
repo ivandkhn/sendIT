@@ -21,7 +21,7 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     //MARK: outlet functions
     @IBAction func tapSendButton(_ sender: UIButton) {
         guard let stringMessage = messageInputField.text else {
-            Log.w("in \(getPeerName()) no text entered in textField, cannot send empty message")
+            Log.w("No text entered in textField, cannot send empty message")
             return
         }
         self.send(stringMessage: stringMessage, encoding: STRING_ENCODING)
@@ -56,7 +56,7 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     func hostSession() {
         mcAdvertiserAssistant = MCAdvertiserAssistant(serviceType: "ivanChat", discoveryInfo: nil, session: mcSession)
         mcAdvertiserAssistant.start()
-        Log.i("\(getPeerName()) is starting session...")
+        Log.i("starting session...")
     }
     
     func joinSession() {
@@ -68,17 +68,17 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     
     func send(stringMessage message: String, encoding: String.Encoding) {
         guard let dataToSend = message.data(using: STRING_ENCODING) else {
-            Log.w("\(getPeerName()) is unable to convert String to Data")
+            Log.w("Unable to convert String to Data")
             return
         }
         guard let currentSession = mcSession else {
-            Log.e("\(getPeerName()) is not connected to anyone, cannot send")
+            Log.e("Not connected to anyone, cannot send")
             return
         }
         do {
             try currentSession.send(dataToSend, toPeers: mcSession.connectedPeers, with: .reliable)
         } catch {
-            Log.e("\(getPeerName()) is unable to send message, errorMessage: ")
+            Log.e("Unable to send message, errorMessage: ")
         }
     }
 
@@ -105,11 +105,11 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         switch state {
         case .connected:
-            Log.i("Connected: \(getPeerName())")
+            Log.i("MCSessionState changed to: Connected")
         case .connecting:
-            Log.i("Connecting to: \(getPeerName())")
+            Log.i("MCSessionState changed to: Connecting")
         case .notConnected:
-            Log.i("Not Connected: \(getPeerName())")
+            Log.i("MCSessionState changed to: Not Connected")
         @unknown default:
             Log.e("Fatal error")
         }
@@ -118,9 +118,9 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         DispatchQueue.main.async {
             if let receivedMessage = String(data: data, encoding: self.STRING_ENCODING) {
-                self.messageHistoryView.text = self.messageHistoryView.text + "\n" + receivedMessage
+                self.messageHistoryView.text = self.messageHistoryView.text + "\n" + self.getPeerName() + " " + receivedMessage
             } else {
-                Log.w("\(self.getPeerName()) is unable to decode received message as string")
+                Log.w("Unable to decode received message as string")
             }
         }
     }
